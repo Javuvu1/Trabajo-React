@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { TextField, Button, Typography, Grid } from "@mui/material";
+import { TextField, Button, Typography, Grid2 } from "@mui/material";
 import { useNavigate } from "react-router";
 import { apiUrl } from "../config";
 
@@ -68,8 +68,8 @@ function BuscarDepartamento() {
   };
 
   return (
-    <Grid container spacing={2} justifyContent="center" alignItems="center" sx={{ mt: 4 }}>
-      <Grid item xs={12} sm={8} md={6}>
+    <Grid2 container spacing={2} justifyContent="center" alignItems="center" sx={{ mt: 4 }}>
+      <Grid2 item xs={12} sm={8} md={6}>
         <Typography variant="h5" align="center">Buscar Departamento</Typography>
 
         {/* Búsqueda por Nombre */}
@@ -107,23 +107,23 @@ function BuscarDepartamento() {
 
         {/* Mostrar Resultados */}
         {resultado && (
-          <Grid container spacing={2} sx={{ mt: 2 }}>
-            <Grid item xs={12}>
+          <Grid2 container spacing={2} sx={{ mt: 2 }}>
+            <Grid2 item xs={12}>
               <Typography variant="h6">Departamento encontrado:</Typography>
               <Typography><strong>Nombre:</strong> {resultado.nombre}</Typography>
               <Typography><strong>Ubicación:</strong> {resultado.ubicacion}</Typography>
               <Typography><strong>Presupuesto:</strong> ${resultado.presupuesto}</Typography>
               <Typography><strong>Fecha de Creación:</strong> {new Date(resultado.fecha_creacion).toLocaleDateString()}</Typography>
-            </Grid>
-            <Grid item xs={12}>
+            </Grid2>
+            <Grid2 item xs={12}>
               <Button fullWidth variant="outlined" onClick={handleModificar}>
                 Modificar Departamento
               </Button>
-            </Grid>
-          </Grid>
+            </Grid2>
+          </Grid2>
         )}
-      </Grid>
-    </Grid>
+      </Grid2>
+    </Grid2>
   );
 }
 

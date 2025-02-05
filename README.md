@@ -1,6 +1,15 @@
 # Node_24-25
 Proyectos Node hechos en clase - 2ºDAM - 2024/2025
 
+Datos para usar la aplicación
+Base de datos:
+nombre: empresa_informatica
+usuario: root
+contraseña: test
+
+Enlace de github: https://github.com/Javuvu1
+
+
 ### **Resumen para configurar la sincronización de proyectos en GitHub desde VSCode**  
 
 1. **Configurar Git en tu máquina:**

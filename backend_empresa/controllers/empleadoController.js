@@ -12,6 +12,40 @@ const models = initModels(sequelize);
 const Empleado = models.empleado;
 
 class EmpleadoController {
+
+  async getGraficaEmpleados(req, res) {
+    try {
+      const data = await Empleado.findAll({
+        attributes: [
+          [sequelize.col("departamento.nombre"), "nombre"], // Nombre del departamento
+          [sequelize.fn("COUNT", sequelize.col("id_empleado")), "cantidad"], // Cantidad de empleados
+        ],
+        include: [
+          {
+            // Usamos models.departamento (en minúsculas) para que coincida con la clave de Empleado
+            model: models.departamento,
+            as: "departamento", // Alias definido en la relación
+            attributes: [],
+          },
+        ],
+        group: ["departamento.nombre"],
+        raw: true,
+      });
+    
+      res.json(Respuesta.exito(data, "Datos de empleados agrupados por departamento recuperados"));
+    } catch (err) {
+      logMensaje("Error al recuperar los datos de empleados: " + err);
+      res
+        .status(500)
+        .json(
+          Respuesta.error(null, `Error al recuperar los datos de empleados: ${req.originalUrl}`)
+        );
+    }
+  }
+  
+  
+
+  
   // Crear un nuevo empleado
   async createEmpleado(req, res) {
     const empleado = req.body;

@@ -11,6 +11,8 @@ import ListadoEmpleado from './components/ListadoEmpleado';
 import ModificarEmpleado from './components/ModificarEmpleado';
 import AltaEmpleado from './components/AltaEmpleado';
 import BuscarEmpleado from './components/BuscarEmpleado';
+import GraficaEmpleados from './components/GraficaEmpleados';
+
 import PaginaError from './pages/PaginaError';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 import "@fortawesome/fontawesome-free/css/all.min.css";
@@ -53,6 +55,10 @@ let router = createBrowserRouter([
         path: "buscarempleado",
         element: <BuscarEmpleado />,
       },
+      {
+        path: "graficaempleados",
+        element: <GraficaEmpleados />,
+      }
     ],
   },
 ]);

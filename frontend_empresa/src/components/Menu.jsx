@@ -22,10 +22,9 @@ import LightModeIcon from "@mui/icons-material/LightMode";
 function Menu() {
   const [openBasic, setOpenBasic] = useState(false);
   const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem("darkMode") === "true"; // Cargar desde localStorage
+    return localStorage.getItem("darkMode") === "true";
   });
 
-  // Efecto para aplicar el tema al cargar la página
   useEffect(() => {
     if (darkMode) {
       document.body.style.backgroundColor = "#121212";
@@ -34,7 +33,7 @@ function Menu() {
       document.body.style.backgroundColor = "white";
       document.body.style.color = "black";
     }
-    localStorage.setItem("darkMode", darkMode); // Guardar preferencia en localStorage
+    localStorage.setItem("darkMode", darkMode);
   }, [darkMode]);
 
   return (
@@ -45,7 +44,6 @@ function Menu() {
           Software Tremendo Inc
         </MDBNavbarBrand>
 
-        {/* Botón para activar/desactivar modo oscuro */}
         <IconButton onClick={() => setDarkMode(!darkMode)} sx={{ ml: 2 }}>
           {darkMode ? <LightModeIcon sx={{ color: "yellow" }} /> : <DarkModeIcon />}
         </IconButton>
@@ -61,7 +59,7 @@ function Menu() {
 
         <MDBCollapse navbar open={openBasic}>
           <MDBNavbarNav className="mr-auto mb-2 mb-lg-0">
-            {/* Menú de Departamentos */}
+            {/* Menú Departamentos */}
             <MDBNavbarItem>
               <MDBDropdown>
                 <MDBDropdownToggle tag="a" className="nav-link" role="button">
@@ -81,7 +79,7 @@ function Menu() {
               </MDBDropdown>
             </MDBNavbarItem>
 
-            {/* Menú de Empleados */}
+            {/* Menú Empleados */}
             <MDBNavbarItem>
               <MDBDropdown>
                 <MDBDropdownToggle tag="a" className="nav-link" role="button">
@@ -96,6 +94,18 @@ function Menu() {
                   </Link>
                   <Link to="/buscarempleado" style={{ color: darkMode ? "white" : "#4f4f4f", textDecoration: "none" }}>
                     <MDBDropdownItem link>Buscar Empleado</MDBDropdownItem>
+                  </Link>
+                  {/* Nueva opción de gráfica */}
+                  <Link 
+                    to="/graficaempleados" 
+                    style={{ 
+                      color: darkMode ? "white" : "#4f4f4f", 
+                      textDecoration: "none" 
+                    }}
+                  >
+                    <MDBDropdownItem link>
+                      Gráfica de Empleados
+                    </MDBDropdownItem>
                   </Link>
                 </MDBDropdownMenu>
               </MDBDropdown>

@@ -3,6 +3,33 @@ const router = express.Router(); // Importar operadores de Sequelize
 const db = require("../models");
 const Empleado = db.Empleado; // Aquí se mantiene como está
 const { Op } = require("sequelize");
+const sequelize = require("../config/sequelize"); // Añade esta línea
+
+// 🔹 Obtener cantidad de empleados por departamento (GET /api/empleado/grafica)
+router.get('/grafica', async (req, res) => {
+  try {
+    const empleadosPorDepartamento = await Empleado.findAll({
+      attributes: [
+        [sequelize.col("departamento.nombre"), "nombre"], // Usar sequelize.col
+        [sequelize.fn("COUNT", sequelize.col("id_empleado")), "cantidad"] // Usar sequelize.fn
+      ],
+      include: {
+        model: db.Departamento,
+        as: "departamento",
+        attributes: []
+      },
+      group: ["departamento.nombre"],
+      raw: true
+    });
+    res.json({ ok: true, datos: empleadosPorDepartamento });
+  } catch (error) {
+    console.error("Error al obtener datos de la gráfica:", error);
+    res.status(500).json({ ok: false, mensaje: "Error al recuperar los datos" });
+  }
+});
+
+
+
 
 // 🔹 Buscar empleados por nombre (GET /api/empleados/buscar?nombre=Juan)
 router.get("/buscar", async (req, res) => {

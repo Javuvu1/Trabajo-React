@@ -12,6 +12,7 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { apiUrl } from "../config";
+import { generateEmployeePDF } from "../utils/GeneratePDF";
 
 function ListadoEmpleado() {
   const [rows, setRows] = useState([]);
@@ -30,10 +31,6 @@ function ListadoEmpleado() {
 
         const data = await response.json();
 
-        // Verificar qué estructura tiene el objeto 'data' que devuelve la API
-        console.log("Respuesta de la API:", data);
-
-        // Asegurarnos de que la propiedad 'datos' existe
         if (data.datos) {
           setRows(data.datos);
         } else {
@@ -64,20 +61,49 @@ function ListadoEmpleado() {
         throw new Error("Error al eliminar empleado");
       }
 
-      // Filtramos la lista para eliminar el empleado borrado
       setRows((rows) => rows.filter((empleado) => empleado.id_empleado !== idEmpleado));
     } catch (error) {
       console.error("Error eliminando empleado:", error);
     }
   };
 
-  return (
-    <>
-      <Typography variant="h4" align="center" sx={{ mt: 2 }}>
-        Listado de Empleados
-      </Typography>
+  const handleGeneratePDF = () => {
+    const columns = [
+      'ID',
+      'Nombre',
+      'Email', 
+      'Salario',
+      'Fecha Contratación',
+      'Departamento'
+    ];
+    
+    const rowsData = rows.map(empleado => [
+      empleado.id_empleado,
+      empleado.nombre,
+      empleado.email,
+      `${empleado.salario} €`,
+      new Date(empleado.fecha_contratacion).toLocaleDateString(),
+      empleado.departamento?.nombre || 'N/A'
+    ]);
 
-      <Grid2 sm={12} md={6} lg={4} mx={4}>
+    generateEmployeePDF(columns, rowsData);
+  };
+
+  return (
+    <Box sx={{ p: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Typography variant="h4">Listado de Empleados</Typography>
+        <Button 
+          variant="contained" 
+          color="primary"
+          onClick={handleGeneratePDF}
+          startIcon={<i className="fas fa-file-pdf"></i>}
+        >
+          Exportar a PDF
+        </Button>
+      </Box>
+
+      <Grid2 container justifyContent="center">
         {loading ? (
           <Box display="flex" justifyContent="center" sx={{ mt: 2 }}>
             <CircularProgress />
@@ -91,37 +117,38 @@ function ListadoEmpleado() {
             <Alert severity="info">No hay empleados disponibles.</Alert>
           </Box>
         ) : (
-          <TableContainer component={Paper} sx={{ mt: 2 }}>
+          <TableContainer component={Paper} sx={{ boxShadow: 3 }}>
             <Table aria-label="simple table">
-              <TableHead>
+              <TableHead sx={{ bgcolor: 'primary.main' }}>
                 <TableRow>
-                  <TableCell align="right">ID EMPLEADO</TableCell>
-                  <TableCell>NOMBRE</TableCell>
-                  <TableCell>CORREO</TableCell>
-                  <TableCell>SALARIO</TableCell>
-                  <TableCell>FECHA DE CONTRATACIÓN</TableCell>
-                  <TableCell>DEPARTAMENTO</TableCell>
-                  <TableCell align="center">ELIMINAR</TableCell>
-                  <TableCell align="center">EDITAR</TableCell>
+                  <TableCell align="right" sx={{ color: 'white' }}>ID</TableCell>
+                  <TableCell sx={{ color: 'white' }}>Nombre</TableCell>
+                  <TableCell sx={{ color: 'white' }}>Email</TableCell>
+                  <TableCell sx={{ color: 'white' }}>Salario</TableCell>
+                  <TableCell sx={{ color: 'white' }}>Fecha Contratación</TableCell>
+                  <TableCell sx={{ color: 'white' }}>Departamento</TableCell>
+                  <TableCell align="center" sx={{ color: 'white' }}>Eliminar</TableCell>
+                  <TableCell align="center" sx={{ color: 'white' }}>Editar</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {rows.map((row) => (
                   <TableRow
                     key={row.id_empleado}
-                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    sx={{ '&:nth-of-type(odd)': { backgroundColor: '#f5f5f5' } }}
                   >
                     <TableCell align="right">{row.id_empleado}</TableCell>
                     <TableCell>{row.nombre}</TableCell>
                     <TableCell>{row.email}</TableCell>
                     <TableCell>{row.salario} €</TableCell>
-                    <TableCell>{row.fecha_contratacion}</TableCell>
-                    <TableCell>{row.departamento?.nombre || 'N/A'}</TableCell> {/* Aquí cambiamos a row.departamento.nombre */}
+                    <TableCell>{new Date(row.fecha_contratacion).toLocaleDateString()}</TableCell>
+                    <TableCell>{row.departamento?.nombre || 'N/A'}</TableCell>
                     <TableCell align="center">
                       <Button
                         variant="contained"
                         onClick={() => handleDelete(row.id_empleado)}
                         color="error"
+                        size="small"
                       >
                         <DeleteForeverIcon fontSize="small" />
                       </Button>
@@ -130,6 +157,8 @@ function ListadoEmpleado() {
                       <Button
                         variant="contained"
                         onClick={() => navigate(`/modificarempleado/${row.id_empleado}`)}
+                        color="primary"
+                        size="small"
                       >
                         <EditNoteIcon fontSize="small" />
                       </Button>
@@ -141,7 +170,7 @@ function ListadoEmpleado() {
           </TableContainer>
         )}
       </Grid2>
-    </>
+    </Box>
   );
 }
 

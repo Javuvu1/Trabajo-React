@@ -5,14 +5,14 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { Typography } from "@mui/material";
+import { Typography, Box, Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import Grid2 from "@mui/material/Grid2";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import Button from "@mui/material/Button";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import { useNavigate } from "react-router";
 import { apiUrl } from "../config";
+import { generateDepartmentPDF } from "../utils/GeneratePDF";
 
 function ListadoDepartamento() {
   const [rows, setRows] = useState([]);
@@ -21,44 +21,58 @@ function ListadoDepartamento() {
   useEffect(() => {
     async function getDepartamentos() {
       let response = await fetch(apiUrl + "/departamentos");
-
       if (response.ok) {
         let data = await response.json();
         setRows(data.datos);
       }
     }
-
     getDepartamentos();
-  }, []); // Se ejecuta solo en el primer renderizado
+  }, []);
 
   const handleDelete = async (idDepartamento) => {
     let response = await fetch(apiUrl + "/departamentos/" + idDepartamento, {
       method: "DELETE",
     });
-
     if (response.ok) {
-      // Utilizando filter creo un array sin el departamento borrado
-      const departamentosTrasBorrado = rows.filter(
-        (departamento) => departamento.id_departamento !== idDepartamento
-      );
-      // Establece los datos de nuevo para provocar un renderizado
-      setRows(departamentosTrasBorrado);
+      setRows(rows.filter((departamento) => departamento.id_departamento !== idDepartamento));
     }
   };
 
-  // Formatear la fecha de creación
-  const formatDate = (date) => {
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    return new Date(date).toLocaleDateString("es-ES", options);
+  const handleGeneratePDF = () => {
+    const columns = [
+      "ID Departamento",
+      "Nombre",
+      "Ubicación", 
+      "Presupuesto",
+      "Fecha de Creación"
+    ];
+    
+    const rowsData = rows.map(departamento => [
+      departamento.id_departamento,
+      departamento.nombre,
+      departamento.ubicacion,
+      `${departamento.presupuesto} €`,
+      new Date(departamento.fecha_creacion).toLocaleDateString("es-ES")
+    ]);
+
+    generateDepartmentPDF(columns, rowsData);
   };
 
   return (
     <>
-      <Typography variant="h4" align="center" sx={{ mt: 2 }}>
-        Listado de Departamentos
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, mx: 4 }}>
+        <Typography variant="h4">Listado de Departamentos</Typography>
+        <Button 
+          variant="contained" 
+          color="primary"
+          onClick={handleGeneratePDF}
+          startIcon={<i className="fas fa-file-pdf"></i>}
+        >
+          Exportar a PDF
+        </Button>
+      </Box>
 
-      <Grid2 sm={ 12 } md={ 6 } lg={ 4 } mx={ 4 }>
+      <Grid2 sm={12} md={6} lg={4} mx={4}>
         <TableContainer component={Paper} sx={{ mt: 2 }}>
           <Table aria-label="simple table">
             <TableHead>
@@ -74,29 +88,19 @@ function ListadoDepartamento() {
             </TableHead>
             <TableBody>
               {rows.map((row) => (
-                <TableRow
-                  key={row.id_departamento}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
+                <TableRow key={row.id_departamento} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                   <TableCell align="right">{row.id_departamento}</TableCell>
                   <TableCell>{row.nombre}</TableCell>
                   <TableCell>{row.ubicacion}</TableCell>
                   <TableCell align="right">{row.presupuesto + " €"}</TableCell>
-                  <TableCell align="right">{formatDate(row.fecha_creacion)}</TableCell> {/* Mostrar fecha formateada */}
+                  <TableCell align="right">{new Date(row.fecha_creacion).toLocaleDateString("es-ES")}</TableCell>
                   <TableCell>
-                    <Button
-                      variant="contained"
-                      onClick={() => handleDelete(row.id_departamento)}
-                      color="error"
-                    >
+                    <Button variant="contained" onClick={() => handleDelete(row.id_departamento)} color="error">
                       <DeleteForeverIcon fontSize="small" />
                     </Button>
                   </TableCell>
                   <TableCell>
-                    <Button
-                      variant="contained"
-                      onClick={() => navigate("/modificardepartamento/" + row.id_departamento)}
-                    >
+                    <Button variant="contained" onClick={() => navigate("/modificardepartamento/" + row.id_departamento)}>
                       <EditNoteIcon fontSize="small" />
                     </Button>
                   </TableCell>

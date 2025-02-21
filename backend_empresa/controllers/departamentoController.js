@@ -1,140 +1,127 @@
-// Importar libreria para respuestas
 const Respuesta = require("../utils/respuesta");
-const { logMensaje } = require("../utils/logger.js");
-// Recuperar función de inicialización de modelos
-const initModels = require("../models/init-models.js").initModels;
-// Crear la instancia de sequelize con la conexión a la base de datos
-const sequelize = require("../config/sequelize.js");
+const { logMensaje } = require("../utils/logger");
+const { Op } = require("sequelize");
+const initModels = require("../models/init-models");
+const sequelize = require("../config/sequelize");
 
-// Cargar las definiciones del modelo en sequelize
 const models = initModels(sequelize);
-// Recuperar el modelo departamento
-const Departamento = models.departamentos;
+const Departamento = models.Departamento; // ✅ Nombre corregido (con mayúscula)
 
 class DepartamentoController {
-  // Crear un nuevo departamento
-  async createDepartamento(req, res) {
-    const departamento = req.body;
+    // 🔍 Búsqueda por nombre
+    async searchDepartamentoByNombre(req, res) {
+        try {
+            const { nombre } = req.query;
 
-    try {
-      const departamentoNuevo = await Departamento.create(departamento);
-      res.status(201).json({ ok: true, mensaje: "Departamento insertado", datos: departamentoNuevo });
-      console.log("Departamento insertado:", departamentoNuevo);
-          } catch (err) {
-      logMensaje("Error :" + err);
-      res
-        .status(500)
-        .json(Respuesta.error(null, `Error al crear un departamento nuevo: ${departamento}`));
-    }
-  }
+            if (!nombre) {
+                return res.status(400).json(Respuesta.error(null, "Debe proporcionar un nombre"));
+            }
 
-  // Recuperar todos los departamentos
-  async getAllDepartamento(req, res) {
-    try {
-      const data = await Departamento.findAll(); // Recuperar todos los departamentos
-      res.json(Respuesta.exito(data, "Datos de departamentos recuperados"));
-    } catch (err) {
-      // Handle errors during the model call
-      res
-        .status(500)
-        .json(
-          Respuesta.error(
-            null,
-            `Error al recuperar los datos de los departamentos: ${req.originalUrl}`
-          )
-        );
-    }
-  }
+            const departamentos = await Departamento.findAll({
+                where: { nombre: { [Op.like]: `%${nombre}%` } }
+            });
 
-  // Eliminar un departamento por su ID
-  async deleteDepartamento(req, res) {
-    const iddepartamento = req.params.iddepartamento;
-    try {
-      const numFilas = await Departamento.destroy({
-        where: {
-          iddepartamento: iddepartamento,
-        },
-      });
-      if (numFilas == 0) {
-        // No se ha encontrado lo que se quería borrar
-        res
-          .status(404)
-          .json(Respuesta.error(null, "No encontrado: " + iddepartamento));
-      } else {
-        res.status(200).json({ ok: true, mensaje: "Departamento eliminado correctamente" });
-      }
-    } catch (err) {
-      logMensaje("Error :" + err);
-      res
-        .status(500)
-        .json(
-          Respuesta.error(
-            null,
-            `Error al eliminar los datos: ${req.originalUrl}`
-          )
-        );
-    }
-  }
+            res.json(Respuesta.exito(departamentos, "Búsqueda exitosa"));
 
-  // Obtener un departamento por su ID
-  async getDepartamentoById(req, res) {
-    const iddepartamento = req.params.iddepartamento;
-    try {
-      const fila = await Departamento.findByPk(iddepartamento);
-      if (fila) {
-        // Si se ha recuperado un departamento
-        res.json(Respuesta.exito(fila, "Departamento recuperado"));
-      } else {
-        res.status(404).json(Respuesta.error(null, "Departamento no encontrado"));
-      }
-    } catch (err) {
-      logMensaje("Error :" + err);
-      res
-        .status(500)
-        .json(
-          Respuesta.error(
-            null,
-            `Error al recuperar los datos: ${req.originalUrl}`
-          )
-        );
-    }
-  }
-
-  // Actualizar un departamento por su ID
-  async updateDepartamento(req, res) {
-    const departamento = req.body; // Recuperamos datos para actualizar
-    const iddepartamento = req.params.iddepartamento; // dato de la ruta
-
-    // Petición errónea, no coincide el id del departamento de la ruta con el del objeto a actualizar
-    if (iddepartamento != departamento.iddepartamento) {
-      return res
-        .status(400)
-        .json(Respuesta.error(null, "El id del departamento no coincide"));
+        } catch (error) {
+            logMensaje(`Error en búsqueda: ${error.message}`);
+            res.status(500).json(Respuesta.error(null, "Error interno"));
+        }
     }
 
-    try {
-      const numFilas = await Departamento.update({ ...departamento }, { where: { iddepartamento } });
-
-      if (numFilas == 0) {
-        // No se ha encontrado lo que se quería actualizar o no hay nada que cambiar
-        res
-          .status(404)
-          .json(Respuesta.error(null, "No encontrado o no modificado: " + iddepartamento));
-      } else {
-        res.status(200).json({ ok: true, mensaje: "Departamento actualizado correctamente" });
-      }
-    } catch (err) {
-      logMensaje("Error :" + err);
-      res
-        .status(500)
-        .json(
-          Respuesta.error(
-            null,
-            `Error al actualizar los datos: ${req.originalUrl}`
-          )
-        );
+    // 📦 Obtener todos los departamentos
+    async getAllDepartamentos(req, res) {
+        try {
+            const departamentos = await Departamento.findAll();
+            res.json(Respuesta.exito(departamentos, "Datos recuperados"));
+        } catch (error) {
+            logMensaje(`Error al obtener departamentos: ${error.message}`);
+            res.status(500).json(Respuesta.error(null, "Error al recuperar datos"));
+        }
     }
-  }
+
+    // 🔎 Obtener por ID
+    async getDepartamentoById(req, res) {
+        try {
+            const id_departamento = req.params.id_departamento;
+            const departamento = await Departamento.findByPk(id_departamento);
+
+            if (!departamento) {
+                return res.status(404).json(Respuesta.error(null, "Departamento no encontrado"));
+            }
+
+            res.json(Respuesta.exito(departamento, "Datos del departamento"));
+        } catch (error) {
+            logMensaje(`Error al buscar departamento: ${error.message}`);
+            res.status(500).json(Respuesta.error(null, "Error al buscar departamento"));
+        }
+    }
+
+    // ➕ Crear departamento
+    async createDepartamento(req, res) {
+        try {
+            const { nombre, ubicacion, presupuesto } = req.body;
+
+            if (!nombre) {
+                return res.status(400).json(Respuesta.error(null, "El nombre es obligatorio"));
+            }
+
+            const nuevoDepartamento = await Departamento.create({
+                nombre,
+                ubicacion,
+                presupuesto
+            });
+
+            res.status(201).json(Respuesta.exito(nuevoDepartamento, "Departamento creado"));
+        } catch (error) {
+            logMensaje(`Error al crear departamento: ${error.message}`);
+            res.status(500).json(Respuesta.error(null, "Error al crear departamento"));
+        }
+    }
+
+    // ✏️ Actualizar departamento
+    async updateDepartamento(req, res) {
+        try {
+            const id_departamento = req.params.id_departamento;
+            const datos = req.body;
+
+            if (id_departamento != datos.id_departamento) {
+                return res.status(400).json(Respuesta.error(null, "ID no coincide"));
+            }
+
+            const [filasActualizadas] = await Departamento.update(datos, {
+                where: { id_departamento }
+            });
+
+            if (filasActualizadas === 0) {
+                return res.status(404).json(Respuesta.error(null, "Departamento no encontrado"));
+            }
+
+            res.status(204).send();
+        } catch (error) {
+            logMensaje(`Error al actualizar: ${error.message}`);
+            res.status(500).json(Respuesta.error(null, "Error al actualizar"));
+        }
+    }
+
+    // 🗑️ Eliminar departamento
+    async deleteDepartamento(req, res) {
+        try {
+            const id_departamento = req.params.id_departamento;
+            const filasEliminadas = await Departamento.destroy({
+                where: { id_departamento }
+            });
+
+            if (filasEliminadas === 0) {
+                return res.status(404).json(Respuesta.error(null, "Departamento no encontrado"));
+            }
+
+            res.status(204).send();
+        } catch (error) {
+            logMensaje(`Error al eliminar: ${error.message}`);
+            res.status(500).json(Respuesta.error(null, "Error al eliminar"));
+        }
+    }
 }
 
 module.exports = new DepartamentoController();

@@ -1,174 +1,170 @@
-// Importar librería para respuestas
 const Respuesta = require("../utils/respuesta");
-const { logMensaje } = require("../utils/logger.js");
-// Recuperar función de inicialización de modelos
-const initModels = require("../models/init-models.js").initModels;
-// Crear la instancia de sequelize con la conexión a la base de datos
-const sequelize = require("../config/sequelize.js");
+const { logMensaje } = require("../utils/logger");
+const { Op } = require("sequelize");
+const initModels = require("../models/init-models");
+const sequelize = require("../config/sequelize");
 
-// Cargar las definiciones del modelo en sequelize
 const models = initModels(sequelize);
-// Recuperar el modelo empleado
-const Empleado = models.empleado;
+const Empleado = models.Empleado; // ✅ Nombre correcto (con mayúscula)
+const Departamento = models.Departamento; // Para relaciones
 
 class EmpleadoController {
-
-  async getGraficaEmpleados(req, res) {
-    try {
-      const data = await Empleado.findAll({
-        attributes: [
-          [sequelize.col("departamento.nombre"), "nombre"], // Nombre del departamento
-          [sequelize.fn("COUNT", sequelize.col("id_empleado")), "cantidad"], // Cantidad de empleados
-        ],
-        include: [
-          {
-            // Usamos models.departamento (en minúsculas) para que coincida con la clave de Empleado
-            model: models.departamento,
-            as: "departamento", // Alias definido en la relación
-            attributes: [],
-          },
-        ],
-        group: ["departamento.nombre"],
-        raw: true,
-      });
-    
-      res.json(Respuesta.exito(data, "Datos de empleados agrupados por departamento recuperados"));
-    } catch (err) {
-      logMensaje("Error al recuperar los datos de empleados: " + err);
-      res
-        .status(500)
-        .json(
-          Respuesta.error(null, `Error al recuperar los datos de empleados: ${req.originalUrl}`)
-        );
-    }
-  }
-  
-  
-
-  
-  // Crear un nuevo empleado
-  async createEmpleado(req, res) {
-    const empleado = req.body;
-
-    try {
-      const empleadoNuevo = await Empleado.create(empleado);
-      res.status(201).json({ ok: true, mensaje: "Empleado insertado", datos: empleadoNuevo });
-      console.log("Empleado insertado:", empleadoNuevo);
-    } catch (err) {
-      logMensaje("Error :" + err);
-      res
-        .status(500)
-        .json(Respuesta.error(null, `Error al crear un empleado nuevo: ${empleado}`));
-    }
-  }
-
-  // Recuperar todos los empleado
-  async getAllempleado(req, res) {
-    try {
-      const data = await Empleado.findAll(); // Recuperar todos los empleado
-      res.json(Respuesta.exito(data, "Datos de empleado recuperados"));
-    } catch (err) {
-      // Manejo de errores durante la llamada al modelo
-      res
-        .status(500)
-        .json(
-          Respuesta.error(
-            null,
-            `Error al recuperar los datos de los empleado: ${req.originalUrl}`
-          )
-        );
-    }
-  }
-
-  // Eliminar un empleado por su ID
-  async deleteEmpleado(req, res) {
-    const idEmpleado = req.params.id;
-    try {
-      const numFilas = await Empleado.destroy({
-        where: {
-          id_empleado: idEmpleado,
-        },
-      });
-      if (numFilas == 0) {
-        // No se ha encontrado lo que se quería borrar
-        res
-          .status(404)
-          .json(Respuesta.error(null, "Empleado no encontrado: " + idEmpleado));
-      } else {
-        res.status(200).json({ ok: true, mensaje: "Empleado eliminado correctamente" });
-      }
-    } catch (err) {
-      logMensaje("Error :" + err);
-      res
-        .status(500)
-        .json(
-          Respuesta.error(
-            null,
-            `Error al eliminar los datos: ${req.originalUrl}`
-          )
-        );
-    }
-  }
-
-  // Obtener un empleado por su ID
-  async getEmpleadoById(req, res) {
-    const idEmpleado = req.params.id;
-    try {
-      const fila = await Empleado.findByPk(idEmpleado);
-      if (fila) {
-        // Si se ha recuperado un empleado
-        res.json(Respuesta.exito(fila, "Empleado recuperado"));
-      } else {
-        res.status(404).json(Respuesta.error(null, "Empleado no encontrado"));
-      }
-    } catch (err) {
-      logMensaje("Error :" + err);
-      res
-        .status(500)
-        .json(
-          Respuesta.error(
-            null,
-            `Error al recuperar los datos: ${req.originalUrl}`
-          )
-        );
-    }
-  }
-
-  // Actualizar un empleado por su ID
-  async updateEmpleado(req, res) {
-    const empleado = req.body; // Recuperamos datos para actualizar
-    const idEmpleado = req.params.id; // dato de la ruta
-
-    // Petición errónea, no coincide el id del empleado de la ruta con el del objeto a actualizar
-    if (idEmpleado != empleado.id_empleado) {
-      return res
-        .status(400)
-        .json(Respuesta.error(null, "El id del empleado no coincide"));
+    // 📊 Gráfica de empleados por departamento
+    async getGraficaEmpleados(req, res) {
+        try {
+            const data = await Empleado.findAll({
+                attributes: [
+                    [sequelize.col("departamento.nombre"), "nombre"],
+                    [sequelize.fn("COUNT", sequelize.col("id_empleado")), "cantidad"],
+                ],
+                include: [{
+                    model: Departamento,
+                    as: "departamento",
+                    attributes: [],
+                }],
+                group: ["departamento.nombre"],
+                raw: true,
+            });
+            
+            res.json(Respuesta.exito(data, "Datos para gráfica recuperados"));
+        } catch (error) {
+            logMensaje(`Error en getGraficaEmpleados: ${error.message}`);
+            res.status(500).json(Respuesta.error(null, "Error al generar gráfica"));
+        }
     }
 
-    try {
-      const numFilas = await Empleado.update({ ...empleado }, { where: { id_empleado: idEmpleado } });
+    // 🔍 Búsqueda por nombre
+    async searchEmpleadoByNombre(req, res) {
+        try {
+            const { nombre } = req.query;
 
-      if (numFilas == 0) {
-        // No se ha encontrado lo que se quería actualizar o no hay nada que cambiar
-        res
-          .status(404)
-          .json(Respuesta.error(null, "Empleado no encontrado o no modificado: " + idEmpleado));
-      } else {
-        res.status(200).json({ ok: true, mensaje: "Empleado actualizado correctamente" });
-      }
-    } catch (err) {
-      logMensaje("Error :" + err);
-      res
-        .status(500)
-        .json(
-          Respuesta.error(
-            null,
-            `Error al actualizar los datos: ${req.originalUrl}`
-          )
-        );
+            if (!nombre?.trim()) {
+                return res.status(400).json(Respuesta.error(null, "El parámetro 'nombre' es obligatorio"));
+            }
+
+            const empleados = await Empleado.findAll({
+                where: { nombre: { [Op.iLike]: `%${nombre}%` } },
+                include: {
+                    model: Departamento,
+                    as: "departamento",
+                    attributes: ["nombre"],
+                },
+            });
+
+            res.json(Respuesta.exito(empleados, "Búsqueda exitosa"));
+        } catch (error) {
+            logMensaje(`Error en searchEmpleadoByNombre: ${error.message}`);
+            res.status(500).json(Respuesta.error(null, "Error en la búsqueda"));
+        }
     }
-  }
+
+    // 📦 Obtener todos
+    async getAllEmpleados(req, res) {
+        try {
+            const empleados = await Empleado.findAll({
+                include: {
+                    model: Departamento,
+                    as: "departamento",
+                    attributes: ["nombre"],
+                },
+            });
+            res.json(Respuesta.exito(empleados, "Empleados recuperados"));
+        } catch (error) {
+            logMensaje(`Error en getAllEmpleados: ${error.message}`);
+            res.status(500).json(Respuesta.error(null, "Error al obtener empleados"));
+        }
+    }
+
+    // 🔎 Obtener por ID
+    async getEmpleadoById(req, res) {
+        try {
+            const id_empleado = req.params.id_empleado;
+            const empleado = await Empleado.findByPk(id_empleado, {
+                include: {
+                    model: Departamento,
+                    as: "departamento",
+                    attributes: ["nombre"],
+                },
+            });
+
+            if (!empleado) {
+                return res.status(404).json(Respuesta.error(null, "Empleado no encontrado"));
+            }
+
+            res.json(Respuesta.exito(empleado, "Datos del empleado"));
+        } catch (error) {
+            logMensaje(`Error en getEmpleadoById: ${error.message}`);
+            res.status(500).json(Respuesta.error(null, "Error al buscar empleado"));
+        }
+    }
+
+    // ➕ Crear
+    async createEmpleado(req, res) {
+        try {
+            const { nombre, email, salario, fecha_contratacion, id_departamento } = req.body;
+
+            if (!nombre || !email || !fecha_contratacion) {
+                return res.status(400).json(Respuesta.error(null, "Nombre, email y fecha son obligatorios"));
+            }
+
+            const nuevoEmpleado = await Empleado.create({
+                nombre: nombre.trim(),
+                email: email.trim(),
+                salario,
+                fecha_contratacion,
+                id_departamento,
+            });
+
+            res.status(201).json(Respuesta.exito(nuevoEmpleado, "Empleado creado"));
+        } catch (error) {
+            logMensaje(`Error en createEmpleado: ${error.message}`);
+            res.status(500).json(Respuesta.error(null, "Error al crear empleado"));
+        }
+    }
+
+    // ✏️ Actualizar
+    async updateEmpleado(req, res) {
+        try {
+            const id_empleado = req.params.id_empleado;
+            const datos = req.body;
+
+            if (id_empleado != datos.id_empleado) {
+                return res.status(400).json(Respuesta.error(null, "ID no coincide"));
+            }
+
+            const [filasActualizadas] = await Empleado.update(datos, {
+                where: { id_empleado },
+            });
+
+            if (filasActualizadas === 0) {
+                return res.status(404).json(Respuesta.error(null, "Empleado no encontrado"));
+            }
+
+            res.status(204).send();
+        } catch (error) {
+            logMensaje(`Error en updateEmpleado: ${error.message}`);
+            res.status(500).json(Respuesta.error(null, "Error al actualizar"));
+        }
+    }
+
+    // 🗑️ Eliminar
+    async deleteEmpleado(req, res) {
+        try {
+            const id_empleado = req.params.id_empleado;
+            const filasEliminadas = await Empleado.destroy({
+                where: { id_empleado },
+            });
+
+            if (filasEliminadas === 0) {
+                return res.status(404).json(Respuesta.error(null, "Empleado no encontrado"));
+            }
+
+            res.status(204).send();
+        } catch (error) {
+            logMensaje(`Error en deleteEmpleado: ${error.message}`);
+            res.status(500).json(Respuesta.error(null, "Error al eliminar"));
+        }
+    }
 }
 
 module.exports = new EmpleadoController();

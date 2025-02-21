@@ -6,13 +6,12 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Grid2 from "@mui/material/Grid2";
-import { Typography, Box, Button, CircularProgress, Alert } from "@mui/material";
+import { Typography, Box, CircularProgress, Alert, Button } from "@mui/material";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { apiUrl } from "../config";
-import { generateEmployeePDF } from "../utils/GeneratePDF";
 
 function ListadoEmpleado() {
   const [rows, setRows] = useState([]);
@@ -67,41 +66,9 @@ function ListadoEmpleado() {
     }
   };
 
-  const handleGeneratePDF = () => {
-    const columns = [
-      'ID',
-      'Nombre',
-      'Email', 
-      'Salario',
-      'Fecha Contratación',
-      'Departamento'
-    ];
-    
-    const rowsData = rows.map(empleado => [
-      empleado.id_empleado,
-      empleado.nombre,
-      empleado.email,
-      `${empleado.salario} €`,
-      new Date(empleado.fecha_contratacion).toLocaleDateString(),
-      empleado.departamento?.nombre || 'N/A'
-    ]);
-
-    generateEmployeePDF(columns, rowsData);
-  };
-
   return (
     <Box sx={{ p: 3 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4">Listado de Empleados</Typography>
-        <Button 
-          variant="contained" 
-          color="primary"
-          onClick={handleGeneratePDF}
-          startIcon={<i className="fas fa-file-pdf"></i>}
-        >
-          Exportar a PDF
-        </Button>
-      </Box>
+      <Typography variant="h4" sx={{ mb: 3 }}>Listado de Empleados</Typography>
 
       <Grid2 container justifyContent="center">
         {loading ? (

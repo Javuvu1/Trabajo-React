@@ -10,9 +10,14 @@ import { useEffect, useState } from "react";
 import Grid2 from "@mui/material/Grid2";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditNoteIcon from "@mui/icons-material/EditNote";
+import PrintIcon from "@mui/icons-material/Print";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import { useNavigate } from "react-router";
 import { apiUrl } from "../config";
-import { generateDepartmentPDF } from "../utils/GeneratePDF";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import DepartamentoReport from "../reports/DepartamentoReport";
 
 function ListadoDepartamento() {
   const [rows, setRows] = useState([]);
@@ -38,42 +43,59 @@ function ListadoDepartamento() {
     }
   };
 
-  const handleGeneratePDF = () => {
-    const columns = [
-      "ID Departamento",
-      "Nombre",
-      "Ubicación", 
-      "Presupuesto",
-      "Fecha de Creación"
-    ];
-    
-    const rowsData = rows.map(departamento => [
-      departamento.id_departamento,
-      departamento.nombre,
-      departamento.ubicacion,
-      `${departamento.presupuesto} €`,
-      new Date(departamento.fecha_creacion).toLocaleDateString("es-ES")
-    ]);
+  // (a) Imprimir con el navegador
+  const handlePrint = () => {
+    window.print();
+  };
 
-    generateDepartmentPDF(columns, rowsData);
+  // (b) Exportar a PDF desde la imagen del listado (jsPDF + html2canvas)
+  const handleGeneratePDF = async () => {
+    const input = document.getElementById("pdf-listado");
+
+    try {
+      const canvas = await html2canvas(input, { scale: 2 });
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("landscape");
+      const imgWidth = 280; // Ajuste para página horizontal
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      pdf.setFontSize(18);
+      pdf.text("Listado de Departamentos", 15, 15);
+      pdf.addImage(imgData, "PNG", 10, 25, imgWidth, imgHeight);
+      pdf.save("listado-departamentos.pdf");
+    } catch (err) {
+      console.error("Error al generar PDF:", err);
+    }
   };
 
   return (
     <>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, mx: 4 }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3, mx: 4 }}>
         <Typography variant="h4">Listado de Departamentos</Typography>
-        <Button 
-          variant="contained" 
-          color="primary"
-          onClick={handleGeneratePDF}
-          startIcon={<i className="fas fa-file-pdf"></i>}
-        >
-          Exportar a PDF
-        </Button>
+        <Box>
+          {/* Botón para imprimir con window.print() */}
+          <Button variant="contained" color="secondary" onClick={handlePrint} startIcon={<PrintIcon />} sx={{ mr: 1 }}>
+            Imprimir
+          </Button>
+
+          {/* Botón para exportar a PDF (imagen) */}
+          <Button variant="contained" color="primary" onClick={handleGeneratePDF} startIcon={<PictureAsPdfIcon />} sx={{ mr: 1 }}>
+            Exportar PDF
+          </Button>
+
+          {/* Botón para exportar a PDF con diseño usando react-pdf */}
+          <PDFDownloadLink document={<DepartamentoReport departamentos={rows} />} fileName="reporte-departamentos.pdf">
+            {({ loading }) => (
+              <Button variant="contained" color="success" startIcon={<PictureAsPdfIcon />} sx={{ mr: 1 }}>
+                {loading ? "Generando PDF..." : "Exportar PDF (Diseñado)"}
+              </Button>
+            )}
+          </PDFDownloadLink>
+        </Box>
       </Box>
 
       <Grid2 sm={12} md={6} lg={4} mx={4}>
-        <TableContainer component={Paper} sx={{ mt: 2 }}>
+        <TableContainer component={Paper} sx={{ mt: 2 }} id="pdf-listado">
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
@@ -94,12 +116,12 @@ function ListadoDepartamento() {
                   <TableCell>{row.ubicacion}</TableCell>
                   <TableCell align="right">{row.presupuesto + " €"}</TableCell>
                   <TableCell align="right">{new Date(row.fecha_creacion).toLocaleDateString("es-ES")}</TableCell>
-                  <TableCell>
+                  <TableCell align="center">
                     <Button variant="contained" onClick={() => handleDelete(row.id_departamento)} color="error">
                       <DeleteForeverIcon fontSize="small" />
                     </Button>
                   </TableCell>
-                  <TableCell>
+                  <TableCell align="center">
                     <Button variant="contained" onClick={() => navigate("/modificardepartamento/" + row.id_departamento)}>
                       <EditNoteIcon fontSize="small" />
                     </Button>

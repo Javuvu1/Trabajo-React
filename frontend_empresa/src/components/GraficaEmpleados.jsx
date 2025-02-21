@@ -10,25 +10,20 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
-import generatePDF from "../utils/GeneratePDF";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 function GraficaEmpleados() {
   const [datos, setDatos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
 
-  // Función para manejar la generación del PDF
-  const handleGenerarPDF = () => {
-    generatePDF('pdf-content', 'grafica-empleados')
-      .catch(err => setError("Error al generar el PDF: " + err.message));
-  };
-
   // Obtener datos de la API
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/empleado/grafica');
-        if (!response.ok) throw new Error('Error al obtener datos');
+        const response = await fetch("http://localhost:3000/api/empleado/grafica");
+        if (!response.ok) throw new Error("Error al obtener datos");
         const { datos } = await response.json();
         setDatos(datos);
       } catch (err) {
@@ -40,19 +35,39 @@ function GraficaEmpleados() {
     fetchData();
   }, []);
 
+  // Función para generar PDF
+  const handleGenerarPDF = async () => {
+    const input = document.getElementById("pdf-content");
+
+    try {
+      const canvas = await html2canvas(input, { scale: 2 });
+      const imgData = canvas.toDataURL("image/png");
+      
+      const pdf = new jsPDF("landscape");
+      const imgWidth = 280; // Ajustado para página horizontal
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      pdf.setFontSize(18);
+      pdf.text("Distribución de Empleados por Departamento", 15, 15);
+      pdf.addImage(imgData, "PNG", 10, 25, imgWidth, imgHeight);
+      pdf.save("grafica-empleados.pdf");
+    } catch (err) {
+      console.error("Error al generar PDF:", err);
+    }
+  };
+
   // Estados de carga y error
   if (cargando) return <Typography variant="h6" sx={{ p: 3 }}>Cargando gráfica...</Typography>;
   if (error) return <Typography color="error" sx={{ p: 3 }}>Error: {error}</Typography>;
 
   return (
     <Box sx={{ p: 3 }}>
-      {/* Botón para generar PDF */}
+      {/* Botón para exportar a PDF */}
       <Button 
         variant="contained" 
         color="primary"
         onClick={handleGenerarPDF}
         sx={{ mb: 3 }}
-        startIcon={<i className="fas fa-file-pdf"></i>}
       >
         Exportar a PDF
       </Button>
@@ -61,15 +76,15 @@ function GraficaEmpleados() {
       <Box
         id="pdf-content"
         sx={{
-          backgroundColor: 'white',
+          backgroundColor: "white",
           p: 4,
           borderRadius: 2,
           boxShadow: 3,
-          maxWidth: '1000px',
-          mx: 'auto'
+          maxWidth: "1000px",
+          mx: "auto",
         }}
       >
-        <Typography variant="h4" component="h1" gutterBottom sx={{ textAlign: 'center', mb: 4 }}>
+        <Typography variant="h4" component="h1" gutterBottom sx={{ textAlign: "center", mb: 4 }}>
           Distribución de Empleados por Departamento
         </Typography>
 
@@ -81,7 +96,7 @@ function GraficaEmpleados() {
             top: 20,
             right: 30,
             left: 20,
-            bottom: 60, // Más espacio para etiquetas rotadas
+            bottom: 60,
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
@@ -90,25 +105,21 @@ function GraficaEmpleados() {
             angle={-45}
             textAnchor="end"
             tick={{ fontSize: 12 }}
-            interval={0} // Muestra todas las etiquetas
+            interval={0}
           />
           <YAxis />
           <Tooltip />
-          <Legend 
-            wrapperStyle={{
-              paddingTop: '20px' // Espacio para la leyenda
-            }}
-          />
+          <Legend wrapperStyle={{ paddingTop: "20px" }} />
           <Bar
             dataKey="cantidad"
             name="Número de empleados"
-            fill="#1976D2" // Color principal de Material-UI
-            activeBar={<Rectangle fill="#82ca9d" stroke="#1976D2" />} // Efecto hover
-            radius={[4, 4, 0, 0]} // Esquinas redondeadas
+            fill="#1976D2"
+            activeBar={<Rectangle fill="#82ca9d" stroke="#1976D2" />}
+            radius={[4, 4, 0, 0]}
           />
         </BarChart>
 
-        <Typography variant="caption" display="block" sx={{ mt: 2, textAlign: 'center' }}>
+        <Typography variant="caption" display="block" sx={{ mt: 2, textAlign: "center" }}>
           Actualizado: {new Date().toLocaleDateString()}
         </Typography>
       </Box>

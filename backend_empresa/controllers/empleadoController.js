@@ -33,30 +33,30 @@ class EmpleadoController {
         }
     }
 
-    // 🔍 Búsqueda por nombre
     async searchEmpleadoByNombre(req, res) {
         try {
-            const { nombre } = req.query;
-
-            if (!nombre?.trim()) {
-                return res.status(400).json(Respuesta.error(null, "El parámetro 'nombre' es obligatorio"));
-            }
-
-            const empleados = await Empleado.findAll({
-                where: { nombre: { [Op.iLike]: `%${nombre}%` } },
-                include: {
-                    model: Departamento,
-                    as: "departamento",
-                    attributes: ["nombre"],
-                },
-            });
-
-            res.json(Respuesta.exito(empleados, "Búsqueda exitosa"));
+          const { nombre } = req.query;
+      
+          if (!nombre?.trim()) {
+            return res.status(400).json(Respuesta.error(null, "El parámetro 'nombre' es obligatorio"));
+          }
+      
+          const empleados = await Empleado.findAll({
+            where: { nombre: { [Op.like]: `%${nombre}%` } },
+            include: {
+              model: Departamento,
+              as: "departamento",
+              attributes: ["nombre"],
+            },
+          });
+      
+          res.json(Respuesta.exito(empleados, "Búsqueda exitosa"));
         } catch (error) {
-            logMensaje(`Error en searchEmpleadoByNombre: ${error.message}`);
-            res.status(500).json(Respuesta.error(null, "Error en la búsqueda"));
+          logMensaje(`Error en searchEmpleadoByNombre: ${error.message}`);
+          res.status(500).json(Respuesta.error(null, "Error en la búsqueda"));
         }
-    }
+      }
+      
 
     // 📦 Obtener todos
     async getAllEmpleados(req, res) {

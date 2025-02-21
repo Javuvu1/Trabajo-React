@@ -2,11 +2,11 @@
 const express = require("express");
 // Importar librería path, para manejar rutas de ficheros en el servidor
 const path = require("path");
-// Importar libreria CORS
+// Importar librería CORS
 const cors = require("cors");
 // Importar gestores de rutas
-const departamentoRoutes = require("./routes/departamentoRoutes");  // <-- Importa las rutas de departamento
-const empleadoRoutes = require("./routes/empleadoRoutes");  // <-- Importa las rutas de empleado
+const departamentoRoutes = require("./routes/departamentoRoutes");  // Rutas de departamento
+const empleadoRoutes = require("./routes/empleadoRoutes");  // Rutas de empleado
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -17,10 +17,15 @@ app.use(express.json());
 app.use(cors());
 
 // Configurar rutas de la API Rest
-app.use("/api/departamentos", departamentoRoutes);  // <-- Agregar la ruta de departamentos
-app.use("/api/empleado", empleadoRoutes);  // <-- Agregar la ruta de empleado
+app.use("/api/departamentos", departamentoRoutes);
+app.use("/api/empleado", empleadoRoutes);
 
-// Iniciar el servidor
-app.listen(port, () => {
-  console.log(`Servidor escuchando en el puerto ${port}`);
-});
+// Iniciar el servidor solo si no estamos en modo de prueba
+if (process.env.NODE_ENV !== "test") {
+  app.listen(port, () => {
+    console.log(`Servidor escuchando en el puerto ${port}`);
+  });
+}
+
+// Exportamos la aplicación para poder hacer pruebas
+module.exports = app;

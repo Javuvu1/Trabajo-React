@@ -1,3 +1,3 @@
 # usuario: root
 # contraseña: test
-# bbdd: empresa_informática
+# bbdd: empresa_informatica

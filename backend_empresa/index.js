@@ -16,6 +16,12 @@ app.use(express.json());
 // Configurar CORS para admitir cualquier origen
 app.use(cors());
 
+app.use(express.static(path.join(__dirname, "public")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
 // Configurar rutas de la API Rest
 app.use("/api/departamentos", departamentoRoutes);
 app.use("/api/empleado", empleadoRoutes);

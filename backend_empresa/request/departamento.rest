@@ -22,6 +22,9 @@ Content-Type: application/json
 DELETE http://localhost:3000/api/departamentos/99
 
 ###
+GET http://localhost:3000/api/departamentos/grafica
+
+###
 
 # Borrado de un departamento que existe (204)
 DELETE http://localhost:3000/api/departamentos/3

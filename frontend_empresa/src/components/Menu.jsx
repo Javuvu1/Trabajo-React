@@ -37,7 +37,12 @@ function Menu() {
   }, [darkMode]);
 
   return (
-    <MDBNavbar expand="lg" light={!darkMode} dark={darkMode} bgColor={darkMode ? "dark" : "light"}>
+    <MDBNavbar
+      expand="lg"
+      light={!darkMode}
+      dark={darkMode}
+      bgColor={darkMode ? "dark" : "light"}
+    >
       <MDBContainer fluid>
         <MDBNavbarBrand href="#">
           <DeviceHubIcon fontSize="large" sx={{ marginRight: 1 }} />
@@ -45,7 +50,11 @@ function Menu() {
         </MDBNavbarBrand>
 
         <IconButton onClick={() => setDarkMode(!darkMode)} sx={{ ml: 2 }}>
-          {darkMode ? <LightModeIcon sx={{ color: "yellow" }} /> : <DarkModeIcon />}
+          {darkMode ? (
+            <LightModeIcon sx={{ color: "yellow" }} />
+          ) : (
+            <DarkModeIcon />
+          )}
         </IconButton>
 
         <MDBNavbarToggler
@@ -65,15 +74,50 @@ function Menu() {
                 <MDBDropdownToggle tag="a" className="nav-link" role="button">
                   Departamentos
                 </MDBDropdownToggle>
-                <MDBDropdownMenu style={{ backgroundColor: darkMode ? "#333" : "white" }}>
-                  <Link to="/altadepartamento" style={{ color: darkMode ? "white" : "#4f4f4f", textDecoration: "none" }}>
-                    <MDBDropdownItem link>Alta de Departamentos</MDBDropdownItem>
+                <MDBDropdownMenu
+                  style={{ backgroundColor: darkMode ? "#333" : "white" }}
+                >
+                  <Link
+                    to="/altadepartamento"
+                    style={{
+                      color: darkMode ? "white" : "#4f4f4f",
+                      textDecoration: "none",
+                    }}
+                  >
+                    <MDBDropdownItem link>
+                      Alta de Departamentos
+                    </MDBDropdownItem>
                   </Link>
-                  <Link to="/listadodepartamentos" style={{ color: darkMode ? "white" : "#4f4f4f", textDecoration: "none" }}>
-                    <MDBDropdownItem link>Listado de Departamentos</MDBDropdownItem>
+                  <Link
+                    to="/listadodepartamentos"
+                    style={{
+                      color: darkMode ? "white" : "#4f4f4f",
+                      textDecoration: "none",
+                    }}
+                  >
+                    <MDBDropdownItem link>
+                      Listado de Departamentos
+                    </MDBDropdownItem>
                   </Link>
-                  <Link to="/buscardepartamento" style={{ color: darkMode ? "white" : "#4f4f4f", textDecoration: "none" }}>
+                  <Link
+                    to="/buscardepartamento"
+                    style={{
+                      color: darkMode ? "white" : "#4f4f4f",
+                      textDecoration: "none",
+                    }}
+                  >
                     <MDBDropdownItem link>Buscar Departamento</MDBDropdownItem>
+                  </Link>
+                  <Link
+                    to="/graficadepartamento"
+                    style={{
+                      color: darkMode ? "white" : "#4f4f4f",
+                      textDecoration: "none",
+                    }}
+                  >
+                    <MDBDropdownItem link>
+                      Gráfica de Departamentos
+                    </MDBDropdownItem>
                   </Link>
                 </MDBDropdownMenu>
               </MDBDropdown>
@@ -85,27 +129,44 @@ function Menu() {
                 <MDBDropdownToggle tag="a" className="nav-link" role="button">
                   Empleados
                 </MDBDropdownToggle>
-                <MDBDropdownMenu style={{ backgroundColor: darkMode ? "#333" : "white" }}>
-                  <Link to="/altaempleado" style={{ color: darkMode ? "white" : "#4f4f4f", textDecoration: "none" }}>
-                    <MDBDropdownItem link>Alta de Empleados</MDBDropdownItem>
-                  </Link>
-                  <Link to="/listadoempleado" style={{ color: darkMode ? "white" : "#4f4f4f", textDecoration: "none" }}>
-                    <MDBDropdownItem link>Listado de Empleado</MDBDropdownItem>
-                  </Link>
-                  <Link to="/buscarempleado" style={{ color: darkMode ? "white" : "#4f4f4f", textDecoration: "none" }}>
-                    <MDBDropdownItem link>Buscar Empleado</MDBDropdownItem>
-                  </Link>
-                  {/* Nueva opción de gráfica */}
-                  <Link 
-                    to="/graficaempleados" 
-                    style={{ 
-                      color: darkMode ? "white" : "#4f4f4f", 
-                      textDecoration: "none" 
+                <MDBDropdownMenu
+                  style={{ backgroundColor: darkMode ? "#333" : "white" }}
+                >
+                  <Link
+                    to="/altaempleado"
+                    style={{
+                      color: darkMode ? "white" : "#4f4f4f",
+                      textDecoration: "none",
                     }}
                   >
-                    <MDBDropdownItem link>
-                      Gráfica de Empleados
-                    </MDBDropdownItem>
+                    <MDBDropdownItem link>Alta de Empleados</MDBDropdownItem>
+                  </Link>
+                  <Link
+                    to="/listadoempleado"
+                    style={{
+                      color: darkMode ? "white" : "#4f4f4f",
+                      textDecoration: "none",
+                    }}
+                  >
+                    <MDBDropdownItem link>Listado de Empleado</MDBDropdownItem>
+                  </Link>
+                  <Link
+                    to="/buscarempleado"
+                    style={{
+                      color: darkMode ? "white" : "#4f4f4f",
+                      textDecoration: "none",
+                    }}
+                  >
+                    <MDBDropdownItem link>Buscar Empleado</MDBDropdownItem>
+                  </Link>
+                  <Link
+                    to="/graficaempleados"
+                    style={{
+                      color: darkMode ? "white" : "#4f4f4f",
+                      textDecoration: "none",
+                    }}
+                  >
+                    <MDBDropdownItem link>Gráfica de Empleados</MDBDropdownItem>
                   </Link>
                 </MDBDropdownMenu>
               </MDBDropdown>

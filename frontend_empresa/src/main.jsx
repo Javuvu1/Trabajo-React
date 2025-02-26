@@ -12,6 +12,7 @@ import ModificarEmpleado from './components/ModificarEmpleado';
 import AltaEmpleado from './components/AltaEmpleado';
 import BuscarEmpleado from './components/BuscarEmpleado';
 import GraficaEmpleados from './components/GraficaEmpleados';
+import GraficaDepartamento from './components/GraficaDepartamento';
 
 import PaginaError from './pages/PaginaError';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
@@ -42,6 +43,10 @@ let router = createBrowserRouter([
       {
         path: "listadoempleado",
         element: <ListadoEmpleado />,
+      },
+      {
+        path: "graficadepartamento",
+        element: <GraficaDepartamento />,
       },
       {
         path: "altaempleado",

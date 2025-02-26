@@ -13,8 +13,8 @@ POST http://localhost:3000/api/empleado
 Content-Type: application/json
 
 {
-    "nombre": "Javier Castillo",
-    "email": "anujo.garcia@empresa.com",
+    "nombre": "Prueboncio Pruebez",
+    "email": "prueba.garcia@empresa.com",
     "salario": 25000.00,
     "fecha_contratacion": "2022-02-10",
     "id_departamento": 2
@@ -26,7 +26,7 @@ DELETE http://localhost:3000/api/empleado/99
 
 ###
 
-DELETE http://localhost:3000/api/empleado/8
+DELETE http://localhost:3000/api/empleado/59
 
 ###
 

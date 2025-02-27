@@ -4,7 +4,12 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { apiUrl } from "../config";
 
+/**
+ * Componente para el formulario de alta de empleados.
+ * @component
+ */
 function AltaEmpleado() {
+  // Estado para almacenar los datos del formulario
   const [datos, setDatos] = useState({
     nombre: "",
     email: "",
@@ -13,10 +18,12 @@ function AltaEmpleado() {
     id_departamento: "",
   });
 
+  // Estado para almacenar la lista de departamentos
   const [departamentos, setDepartamentos] = useState([]);
   const [errorSalario, setErrorSalario] = useState("");
   const navigate = useNavigate();
 
+  // Efecto para cargar los departamentos al montar el componente
   useEffect(() => {
     async function fetchDepartamentos() {
       try {
@@ -36,6 +43,10 @@ function AltaEmpleado() {
     fetchDepartamentos();
   }, []);
 
+  /**
+   * Maneja el envío del formulario.
+   * @param {Event} e - Evento de envío del formulario.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -78,6 +89,10 @@ function AltaEmpleado() {
     }
   };
 
+  /**
+   * Maneja los cambios en los campos del formulario.
+   * @param {Event} e - Evento de cambio en los campos del formulario.
+   */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setDatos({ ...datos, [name]: value });

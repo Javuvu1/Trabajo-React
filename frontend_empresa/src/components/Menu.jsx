@@ -19,12 +19,17 @@ import { IconButton } from "@mui/material";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 
+/**
+ * Componente del menú de navegación.
+ * @component
+ */
 function Menu() {
   const [openBasic, setOpenBasic] = useState(false);
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem("darkMode") === "true";
   });
 
+  // Efecto para aplicar el modo oscuro o claro
   useEffect(() => {
     if (darkMode) {
       document.body.style.backgroundColor = "#121212";
@@ -37,12 +42,7 @@ function Menu() {
   }, [darkMode]);
 
   return (
-    <MDBNavbar
-      expand="lg"
-      light={!darkMode}
-      dark={darkMode}
-      bgColor={darkMode ? "dark" : "light"}
-    >
+    <MDBNavbar expand="lg" light={!darkMode} dark={darkMode} bgColor={darkMode ? "dark" : "light"}>
       <MDBContainer fluid>
         <MDBNavbarBrand href="#">
           <DeviceHubIcon fontSize="large" sx={{ marginRight: 1 }} />
@@ -50,11 +50,7 @@ function Menu() {
         </MDBNavbarBrand>
 
         <IconButton onClick={() => setDarkMode(!darkMode)} sx={{ ml: 2 }}>
-          {darkMode ? (
-            <LightModeIcon sx={{ color: "yellow" }} />
-          ) : (
-            <DarkModeIcon />
-          )}
+          {darkMode ? <LightModeIcon sx={{ color: "yellow" }} /> : <DarkModeIcon />}
         </IconButton>
 
         <MDBNavbarToggler
@@ -74,9 +70,7 @@ function Menu() {
                 <MDBDropdownToggle tag="a" className="nav-link" role="button">
                   Departamentos
                 </MDBDropdownToggle>
-                <MDBDropdownMenu
-                  style={{ backgroundColor: darkMode ? "#333" : "white" }}
-                >
+                <MDBDropdownMenu style={{ backgroundColor: darkMode ? "#333" : "white" }}>
                   <Link
                     to="/altadepartamento"
                     style={{
@@ -129,9 +123,7 @@ function Menu() {
                 <MDBDropdownToggle tag="a" className="nav-link" role="button">
                   Empleados
                 </MDBDropdownToggle>
-                <MDBDropdownMenu
-                  style={{ backgroundColor: darkMode ? "#333" : "white" }}
-                >
+                <MDBDropdownMenu style={{ backgroundColor: darkMode ? "#333" : "white" }}>
                   <Link
                     to="/altaempleado"
                     style={{

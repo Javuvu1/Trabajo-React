@@ -1,4 +1,32 @@
-import { Typography, TextField, Stack, Button, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: ModificarEmpleado.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: ModificarEmpleado.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { Typography, TextField, Stack, Button, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
 import Grid2 from "@mui/material/Grid2";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
@@ -114,14 +142,14 @@ function ModificarEmpleado() {
   };
 
   return (
-    <>
-      <Typography variant="h4" align="center" sx={{ mt: 2 }}>
+    &lt;>
+      &lt;Typography variant="h4" align="center" sx={{ mt: 2 }}>
         Modificar Empleado
-      </Typography>
-      <Grid2 container spacing={2} sx={{ mt: 2, justifyContent: "center", alignItems: "center" }}>
-        <Grid2 item xs={12} sm={6} md={4}>
-          <Stack component="form" spacing={2} onSubmit={handleSubmit} sx={{ mx: 2 }}>
-            <TextField
+      &lt;/Typography>
+      &lt;Grid2 container spacing={2} sx={{ mt: 2, justifyContent: "center", alignItems: "center" }}>
+        &lt;Grid2 item xs={12} sm={6} md={4}>
+          &lt;Stack component="form" spacing={2} onSubmit={handleSubmit} sx={{ mx: 2 }}>
+            &lt;TextField
               label="Nombre"
               variant="outlined"
               name="nombre"
@@ -129,7 +157,7 @@ function ModificarEmpleado() {
               onChange={handleChange}
               required
             />
-            <TextField
+            &lt;TextField
               label="Email"
               variant="outlined"
               name="email"
@@ -137,7 +165,7 @@ function ModificarEmpleado() {
               onChange={handleChange}
               required
             />
-            <TextField
+            &lt;TextField
               label="Salario"
               variant="outlined"
               name="salario"
@@ -146,7 +174,7 @@ function ModificarEmpleado() {
               value={datos.salario}
               onChange={handleChange}
             />
-            <TextField
+            &lt;TextField
               label="Fecha de Contratación"
               variant="outlined"
               name="fecha_contratacion"
@@ -158,30 +186,53 @@ function ModificarEmpleado() {
             />
 
             {/* SELECT para seleccionar departamento */}
-            <FormControl fullWidth>
-              <InputLabel>Departamento</InputLabel>
-              <Select
+            &lt;FormControl fullWidth>
+              &lt;InputLabel>Departamento&lt;/InputLabel>
+              &lt;Select
                 name="id_departamento"
                 value={datos.id_departamento || ""}
                 onChange={handleChange}
                 required
               >
                 {departamentos.map((dep) => (
-                  <MenuItem key={dep.id_departamento} value={dep.id_departamento}>
+                  &lt;MenuItem key={dep.id_departamento} value={dep.id_departamento}>
                     {dep.nombre} {/* Muestra el nombre del departamento */}
-                  </MenuItem>
+                  &lt;/MenuItem>
                 ))}
-              </Select>
-            </FormControl>
+              &lt;/Select>
+            &lt;/FormControl>
 
-            <Button variant="contained" type="submit">
+            &lt;Button variant="contained" type="submit">
               Guardar Cambios
-            </Button>
-          </Stack>
-        </Grid2>
-      </Grid2>
-    </>
+            &lt;/Button>
+          &lt;/Stack>
+        &lt;/Grid2>
+      &lt;/Grid2>
+    &lt;/>
   );
 }
 
 export default ModificarEmpleado;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#AltaDepartamento">AltaDepartamento</a></li><li><a href="global.html#AltaEmpleado">AltaEmpleado</a></li><li><a href="global.html#BuscarDepartamento">BuscarDepartamento</a></li><li><a href="global.html#BuscarEmpleado">BuscarEmpleado</a></li><li><a href="global.html#GraficaDepartamento">GraficaDepartamento</a></li><li><a href="global.html#GraficaEmpleados">GraficaEmpleados</a></li><li><a href="global.html#ListadoDepartamento">ListadoDepartamento</a></li><li><a href="global.html#ListadoEmpleado">ListadoEmpleado</a></li><li><a href="global.html#Menu">Menu</a></li><li><a href="global.html#ModificarDepartamento">ModificarDepartamento</a></li><li><a href="global.html#ModificarEmpleado">ModificarEmpleado</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Thu Feb 27 2025 11:25:20 GMT+0100 (hora estándar de Europa central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

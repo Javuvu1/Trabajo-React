@@ -13,12 +13,17 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { apiUrl } from "../config";
 
+/**
+ * Componente para listar los empleados.
+ * @component
+ */
 function ListadoEmpleado() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  // Obtener la lista de empleados al montar el componente
   useEffect(() => {
     async function getempleado() {
       try {
@@ -47,6 +52,10 @@ function ListadoEmpleado() {
     getempleado();
   }, []);
 
+  /**
+   * Maneja la eliminación de un empleado.
+   * @param {number} idEmpleado - ID del empleado a eliminar.
+   */
   const handleDelete = async (idEmpleado) => {
     const confirmation = window.confirm("¿Estás seguro de que deseas eliminar este empleado?");
     if (!confirmation) return;

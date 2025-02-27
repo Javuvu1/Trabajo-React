@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: AltaEmpleado.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: AltaEmpleado.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { Typography, TextField, Stack, Button, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
+import Grid2 from "@mui/material/Grid2";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
+import { apiUrl } from "../config";
+
+/**
+ * Componente para el formulario de alta de empleados.
+ * @component
+ */
+function AltaEmpleado() {
+  // Estado para almacenar los datos del formulario
+  const [datos, setDatos] = useState({
+    nombre: "",
+    email: "",
+    salario: "",
+    fecha_contratacion: "",
+    id_departamento: "",
+  });
+
+  // Estado para almacenar la lista de departamentos
+  const [departamentos, setDepartamentos] = useState([]);
+  const [errorSalario, setErrorSalario] = useState("");
+  const navigate = useNavigate();
+
+  // Efecto para cargar los departamentos al montar el componente
+  useEffect(() => {
+    async function fetchDepartamentos() {
+      try {
+        const response = await fetch(`${apiUrl}/departamentos`);
+        if (response.ok) {
+          const data = await response.json();
+          setDepartamentos(data.datos);
+        } else {
+          alert("Error al cargar los departamentos.");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Error al conectar con el servidor.");
+      }
+    }
+
+    fetchDepartamentos();
+  }, []);
+
+  /**
+   * Maneja el envío del formulario.
+   * @param {Event} e - Evento de envío del formulario.
+   */
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (datos.salario &lt; 2000) {
+      alert("El salario no puede ser menor a 2000");
+      return;
+    }
+
+    const datosFinales = {
+      ...datos,
+      salario: datos.salario ? parseFloat(datos.salario) : 0,
+      id_departamento: datos.id_departamento ? parseInt(datos.id_departamento) : 0,
+    };
+
+    console.log("Enviando datos:", datosFinales);
+
+    try {
+      const response = await fetch(`${apiUrl}/empleado`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(datosFinales),
+      });
+
+      const respuesta = await response.json();
+      console.log("Respuesta del servidor:", respuesta);
+
+      if (response.ok) {
+        alert(respuesta?.mensaje || "Empleado creado correctamente.");
+        if (respuesta.ok) {
+          navigate("/listadoempleado");
+        }
+      } else {
+        alert(respuesta?.mensaje || "Error al crear el empleado.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error al conectar con el servidor.");
+    }
+  };
+
+  /**
+   * Maneja los cambios en los campos del formulario.
+   * @param {Event} e - Evento de cambio en los campos del formulario.
+   */
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setDatos({ ...datos, [name]: value });
+
+    if (name === "salario") {
+      if (value &lt; 2000) {
+        setErrorSalario("El salario no puede ser menor a 2000");
+      } else {
+        setErrorSalario("");
+      }
+    }
+  };
+
+  return (
+    &lt;>
+      &lt;Typography variant="h4" align="center" sx={{ mt: 2 }}>
+        Alta de Empleado
+      &lt;/Typography>
+      &lt;Grid2 container spacing={2} sx={{ mt: 2, justifyContent: "center", alignItems: "center" }}>
+        &lt;Grid2 item xs={12} sm={6} md={4}>
+          &lt;Stack component="form" spacing={2} onSubmit={handleSubmit} sx={{ mx: 2 }}>
+            &lt;TextField label="Nombre" variant="outlined" name="nombre" value={datos.nombre} onChange={handleChange} required />
+            &lt;TextField label="Email" variant="outlined" name="email" value={datos.email} onChange={handleChange} required />
+            &lt;TextField label="Salario" variant="outlined" name="salario" type="number" step="0.01" value={datos.salario} onChange={handleChange} required />
+            {errorSalario &amp;&amp; &lt;Typography color="error">{errorSalario}&lt;/Typography>}
+            &lt;TextField label="Fecha de Contratación" variant="outlined" name="fecha_contratacion" type="date" value={datos.fecha_contratacion} onChange={handleChange} required InputLabelProps={{ shrink: true }} />
+            &lt;FormControl>
+              &lt;InputLabel>Departamento&lt;/InputLabel>
+              &lt;Select name="id_departamento" value={datos.id_departamento} onChange={handleChange} required>
+                {departamentos.map((dep) => (
+                  &lt;MenuItem key={dep.id_departamento} value={dep.id_departamento}>
+                    {dep.nombre}
+                  &lt;/MenuItem>
+                ))}
+              &lt;/Select>
+            &lt;/FormControl>
+            &lt;Button variant="contained" type="submit">
+              Aceptar
+            &lt;/Button>
+          &lt;/Stack>
+        &lt;/Grid2>
+      &lt;/Grid2>
+    &lt;/>
+  );
+}
+
+export default AltaEmpleado;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#AltaDepartamento">AltaDepartamento</a></li><li><a href="global.html#AltaEmpleado">AltaEmpleado</a></li><li><a href="global.html#BuscarDepartamento">BuscarDepartamento</a></li><li><a href="global.html#BuscarEmpleado">BuscarEmpleado</a></li><li><a href="global.html#GraficaDepartamento">GraficaDepartamento</a></li><li><a href="global.html#GraficaEmpleados">GraficaEmpleados</a></li><li><a href="global.html#ListadoDepartamento">ListadoDepartamento</a></li><li><a href="global.html#ListadoEmpleado">ListadoEmpleado</a></li><li><a href="global.html#Menu">Menu</a></li><li><a href="global.html#ModificarDepartamento">ModificarDepartamento</a></li><li><a href="global.html#ModificarEmpleado">ModificarEmpleado</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Thu Feb 27 2025 11:25:20 GMT+0100 (hora estándar de Europa central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

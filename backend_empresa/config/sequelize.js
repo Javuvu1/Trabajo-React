@@ -1,5 +1,6 @@
 // config/sequelize.js
 const { Sequelize } = require("sequelize");
+const { db } = require("./config");
 
 // Instanciar sequelize  para conectar a mysql
 const sequelize = new Sequelize(

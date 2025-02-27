@@ -3,6 +3,10 @@ import { TextField, Button, Typography, Grid2, Card, CardContent, CardActions } 
 import { useNavigate } from "react-router";
 import { apiUrl } from "../config";
 
+/**
+ * Componente para buscar empleados por nombre o ID.
+ * @component
+ */
 function BuscarEmpleado() {
   const [nombre, setNombre] = useState("");
   const [idEmpleado, setIdEmpleado] = useState(""); // Nuevo estado para buscar por ID
@@ -10,7 +14,9 @@ function BuscarEmpleado() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // Buscar por nombre
+  /**
+   * Maneja la búsqueda de empleados por nombre.
+   */
   const handleBuscarPorNombre = async () => {
     setError("");
     setResultados([]);
@@ -35,7 +41,9 @@ function BuscarEmpleado() {
     }
   };
 
-  // Buscar por ID
+  /**
+   * Maneja la búsqueda de empleados por ID.
+   */
   const handleBuscarPorId = async () => {
     setError("");
     setResultados([]);
@@ -60,12 +68,18 @@ function BuscarEmpleado() {
     }
   };
 
-  // Redirigir a la pantalla de modificación
+  /**
+   * Redirige a la pantalla de modificación.
+   * @param {number} id - ID del empleado a modificar.
+   */
   const handleModificar = (id) => {
     navigate(`/modificarempleado/${id}`);
   };
 
-  // Eliminar un empleado
+  /**
+   * Elimina un empleado.
+   * @param {number} id - ID del empleado a eliminar.
+   */
   const handleEliminar = async (id) => {
     const confirmar = window.confirm("¿Estás seguro de que deseas eliminar este empleado?");
     if (!confirmar) return;

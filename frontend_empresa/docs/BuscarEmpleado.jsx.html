@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: BuscarEmpleado.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: BuscarEmpleado.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { useState } from "react";
+import { TextField, Button, Typography, Grid2, Card, CardContent, CardActions } from "@mui/material";
+import { useNavigate } from "react-router";
+import { apiUrl } from "../config";
+
+/**
+ * Componente para buscar empleados por nombre o ID.
+ * @component
+ */
+function BuscarEmpleado() {
+  const [nombre, setNombre] = useState("");
+  const [idEmpleado, setIdEmpleado] = useState(""); // Nuevo estado para buscar por ID
+  const [resultados, setResultados] = useState([]);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  /**
+   * Maneja la búsqueda de empleados por nombre.
+   */
+  const handleBuscarPorNombre = async () => {
+    setError("");
+    setResultados([]);
+
+    if (!nombre.trim()) {
+      setError("Por favor, ingrese un nombre de empleado.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${apiUrl}/empleado/buscar?nombre=${encodeURIComponent(nombre)}`);
+      const data = await response.json();
+
+      if (response.ok &amp;&amp; data.datos &amp;&amp; data.datos.length > 0) {
+        setResultados(data.datos);
+      } else {
+        setError(data.mensaje || "No se encontró ningún empleado con ese nombre.");
+      }
+    } catch (err) {
+      console.error("Error en la búsqueda:", err);
+      setError("Error al conectar con el servidor.");
+    }
+  };
+
+  /**
+   * Maneja la búsqueda de empleados por ID.
+   */
+  const handleBuscarPorId = async () => {
+    setError("");
+    setResultados([]);
+
+    if (!idEmpleado.trim()) {
+      setError("Por favor, ingrese un ID de empleado.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${apiUrl}/empleado/${idEmpleado}`);
+      const data = await response.json();
+
+      if (response.ok &amp;&amp; data.datos) {
+        setResultados([data.datos]); // Convertimos el objeto en array para reusar el mismo renderizado
+      } else {
+        setError(data.mensaje || "No se encontró ningún empleado con ese ID.");
+      }
+    } catch (err) {
+      console.error("Error en la búsqueda:", err);
+      setError("Error al conectar con el servidor.");
+    }
+  };
+
+  /**
+   * Redirige a la pantalla de modificación.
+   * @param {number} id - ID del empleado a modificar.
+   */
+  const handleModificar = (id) => {
+    navigate(`/modificarempleado/${id}`);
+  };
+
+  /**
+   * Elimina un empleado.
+   * @param {number} id - ID del empleado a eliminar.
+   */
+  const handleEliminar = async (id) => {
+    const confirmar = window.confirm("¿Estás seguro de que deseas eliminar este empleado?");
+    if (!confirmar) return;
+
+    try {
+      const response = await fetch(`${apiUrl}/empleado/${id}`, {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setResultados(resultados.filter((empleado) => empleado.id_empleado !== id));
+        alert("Empleado eliminado correctamente.");
+      } else {
+        setError(data.mensaje || "No se pudo eliminar al empleado.");
+      }
+    } catch (err) {
+      console.error("Error al eliminar el empleado:", err);
+      setError("Error al conectar con el servidor.");
+    }
+  };
+
+  return (
+    &lt;Grid2 container spacing={2} justifyContent="center" alignItems="center" sx={{ mt: 4 }}>
+      &lt;Grid2 item xs={12} sm={8} md={6}>
+        &lt;Typography variant="h5" align="center">Buscar Empleado&lt;/Typography>
+
+        {/* Búsqueda por Nombre */}
+        &lt;TextField
+          fullWidth
+          label="Nombre del Empleado"
+          variant="outlined"
+          value={nombre}
+          onChange={(e) => setNombre(e.target.value)}
+          sx={{ mt: 2 }}
+        />
+        &lt;Button fullWidth variant="contained" onClick={handleBuscarPorNombre} sx={{ mt: 2 }}>
+          Buscar por Nombre
+        &lt;/Button>
+
+        {/* Búsqueda por ID */}
+        &lt;TextField
+          fullWidth
+          label="ID del Empleado"
+          variant="outlined"
+          value={idEmpleado}
+          onChange={(e) => setIdEmpleado(e.target.value)}
+          sx={{ mt: 2 }}
+        />
+        &lt;Button fullWidth variant="contained" color="secondary" onClick={handleBuscarPorId} sx={{ mt: 2 }}>
+          Buscar por ID
+        &lt;/Button>
+
+        {/* Muestra errores */}
+        {error &amp;&amp; (
+          &lt;Typography color="error" sx={{ mt: 2 }}>
+            {error}
+          &lt;/Typography>
+        )}
+
+        {/* Mostrar Resultados */}
+        {resultados.length > 0 ? (
+          &lt;Grid2 container spacing={2} sx={{ mt: 2 }}>
+            {resultados.map((empleado) => (
+              &lt;Grid2 item xs={12} sm={6} md={4} key={empleado.id_empleado}>
+                &lt;Card>
+                  &lt;CardContent>
+                    &lt;Typography variant="h6">{empleado.nombre}&lt;/Typography>
+                    &lt;Typography>&lt;strong>Email:&lt;/strong> {empleado.email}&lt;/Typography>
+                    &lt;Typography>&lt;strong>Salario:&lt;/strong> ${empleado.salario}&lt;/Typography>
+                    &lt;Typography>&lt;strong>Fecha de Contratación:&lt;/strong> {new Date(empleado.fecha_contratacion).toLocaleDateString()}&lt;/Typography>
+                    &lt;Typography>&lt;strong>Departamento:&lt;/strong> {empleado.departamento?.nombre || 'N/A'}&lt;/Typography>
+                  &lt;/CardContent>
+                  &lt;CardActions>
+                    &lt;Button size="small" variant="outlined" onClick={() => handleModificar(empleado.id_empleado)}>
+                      Modificar
+                    &lt;/Button>
+                    &lt;Button size="small" variant="outlined" color="error" onClick={() => handleEliminar(empleado.id_empleado)}>
+                      Eliminar
+                    &lt;/Button>
+                  &lt;/CardActions>
+                &lt;/Card>
+              &lt;/Grid2>
+            ))}
+          &lt;/Grid2>
+        ) : (
+          &lt;Typography color="textSecondary" sx={{ mt: 2 }}>
+            No se encontraron empleados con los criterios de búsqueda.
+          &lt;/Typography>
+        )}
+      &lt;/Grid2>
+    &lt;/Grid2>
+  );
+}
+
+export default BuscarEmpleado;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#AltaDepartamento">AltaDepartamento</a></li><li><a href="global.html#AltaEmpleado">AltaEmpleado</a></li><li><a href="global.html#BuscarDepartamento">BuscarDepartamento</a></li><li><a href="global.html#BuscarEmpleado">BuscarEmpleado</a></li><li><a href="global.html#GraficaDepartamento">GraficaDepartamento</a></li><li><a href="global.html#GraficaEmpleados">GraficaEmpleados</a></li><li><a href="global.html#ListadoDepartamento">ListadoDepartamento</a></li><li><a href="global.html#ListadoEmpleado">ListadoEmpleado</a></li><li><a href="global.html#Menu">Menu</a></li><li><a href="global.html#ModificarDepartamento">ModificarDepartamento</a></li><li><a href="global.html#ModificarEmpleado">ModificarEmpleado</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Thu Feb 27 2025 11:25:20 GMT+0100 (hora estándar de Europa central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

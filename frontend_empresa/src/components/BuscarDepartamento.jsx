@@ -3,6 +3,10 @@ import { TextField, Button, Typography, Grid2 } from "@mui/material";
 import { useNavigate } from "react-router";
 import { apiUrl } from "../config";
 
+/**
+ * Componente para buscar departamentos por nombre o ID.
+ * @component
+ */
 function BuscarDepartamento() {
   const [nombre, setNombre] = useState("");
   const [idDepartamento, setIdDepartamento] = useState(""); // Nuevo estado para buscar por ID
@@ -10,7 +14,9 @@ function BuscarDepartamento() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // Buscar por nombre
+  /**
+   * Maneja la búsqueda de departamentos por nombre.
+   */
   const handleBuscarPorNombre = async () => {
     setError("");
     setResultado(null);
@@ -35,7 +41,9 @@ function BuscarDepartamento() {
     }
   };
 
-  // Buscar por ID
+  /**
+   * Maneja la búsqueda de departamentos por ID.
+   */
   const handleBuscarPorId = async () => {
     setError("");
     setResultado(null);
@@ -60,7 +68,9 @@ function BuscarDepartamento() {
     }
   };
 
-  // Redirigir a la pantalla de modificación si se encuentra el departamento
+  /**
+   * Redirige a la pantalla de modificación si se encuentra el departamento.
+   */
   const handleModificar = () => {
     if (resultado?.id_departamento) {
       navigate(`/modificardepartamento/${resultado.id_departamento}`);

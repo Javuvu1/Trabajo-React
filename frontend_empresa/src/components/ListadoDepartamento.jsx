@@ -19,10 +19,15 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import DepartamentoReport from "../reports/DepartamentoReport";
 
+/**
+ * Componente para listar los departamentos.
+ * @component
+ */
 function ListadoDepartamento() {
   const [rows, setRows] = useState([]);
   const navigate = useNavigate();
 
+  // Obtener la lista de departamentos al montar el componente
   useEffect(() => {
     async function getDepartamentos() {
       let response = await fetch(apiUrl + "/departamentos");
@@ -34,6 +39,10 @@ function ListadoDepartamento() {
     getDepartamentos();
   }, []);
 
+  /**
+   * Maneja la eliminación de un departamento.
+   * @param {number} idDepartamento - ID del departamento a eliminar.
+   */
   const handleDelete = async (idDepartamento) => {
     let response = await fetch(apiUrl + "/departamentos/" + idDepartamento, {
       method: "DELETE",
@@ -43,12 +52,16 @@ function ListadoDepartamento() {
     }
   };
 
-  // (a) Imprimir con el navegador
+  /**
+   * Imprime la lista de departamentos usando el navegador.
+   */
   const handlePrint = () => {
     window.print();
   };
 
-  // (b) Exportar a PDF desde la imagen del listado (jsPDF + html2canvas)
+  /**
+   * Exporta la lista de departamentos a PDF usando jsPDF y html2canvas.
+   */
   const handleGeneratePDF = async () => {
     const input = document.getElementById("pdf-listado");
 

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: ListadoEmpleado.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: ListadoEmpleado.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import Grid2 from "@mui/material/Grid2";
+import { Typography, Box, CircularProgress, Alert, Button } from "@mui/material";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import EditNoteIcon from "@mui/icons-material/EditNote";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
+import { apiUrl } from "../config";
+
+/**
+ * Componente para listar los empleados.
+ * @component
+ */
+function ListadoEmpleado() {
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  // Obtener la lista de empleados al montar el componente
+  useEffect(() => {
+    async function getempleado() {
+      try {
+        const response = await fetch(`${apiUrl}/empleado`);
+
+        if (!response.ok) {
+          throw new Error("Error al obtener empleados");
+        }
+
+        const data = await response.json();
+
+        if (data.datos) {
+          setRows(data.datos);
+        } else {
+          setError("No se encontraron empleados");
+        }
+
+        setLoading(false);
+      } catch (error) {
+        setError("Hubo un error al cargar los empleados.");
+        setLoading(false);
+        console.error("Error en la carga de empleados:", error);
+      }
+    }
+
+    getempleado();
+  }, []);
+
+  /**
+   * Maneja la eliminación de un empleado.
+   * @param {number} idEmpleado - ID del empleado a eliminar.
+   */
+  const handleDelete = async (idEmpleado) => {
+    const confirmation = window.confirm("¿Estás seguro de que deseas eliminar este empleado?");
+    if (!confirmation) return;
+
+    try {
+      const response = await fetch(`${apiUrl}/empleado/${idEmpleado}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al eliminar empleado");
+      }
+
+      setRows((rows) => rows.filter((empleado) => empleado.id_empleado !== idEmpleado));
+    } catch (error) {
+      console.error("Error eliminando empleado:", error);
+    }
+  };
+
+  return (
+    &lt;Box sx={{ p: 3 }}>
+      &lt;Typography variant="h4" sx={{ mb: 3 }}>Listado de Empleados&lt;/Typography>
+
+      &lt;Grid2 container justifyContent="center">
+        {loading ? (
+          &lt;Box display="flex" justifyContent="center" sx={{ mt: 2 }}>
+            &lt;CircularProgress />
+          &lt;/Box>
+        ) : error ? (
+          &lt;Box sx={{ mt: 2 }}>
+            &lt;Alert severity="error">{error}&lt;/Alert>
+          &lt;/Box>
+        ) : rows.length === 0 ? (
+          &lt;Box sx={{ mt: 2 }}>
+            &lt;Alert severity="info">No hay empleados disponibles.&lt;/Alert>
+          &lt;/Box>
+        ) : (
+          &lt;TableContainer component={Paper} sx={{ boxShadow: 3 }}>
+            &lt;Table aria-label="simple table">
+              &lt;TableHead sx={{ bgcolor: 'primary.main' }}>
+                &lt;TableRow>
+                  &lt;TableCell align="right" sx={{ color: 'white' }}>ID&lt;/TableCell>
+                  &lt;TableCell sx={{ color: 'white' }}>Nombre&lt;/TableCell>
+                  &lt;TableCell sx={{ color: 'white' }}>Email&lt;/TableCell>
+                  &lt;TableCell sx={{ color: 'white' }}>Salario&lt;/TableCell>
+                  &lt;TableCell sx={{ color: 'white' }}>Fecha Contratación&lt;/TableCell>
+                  &lt;TableCell sx={{ color: 'white' }}>Departamento&lt;/TableCell>
+                  &lt;TableCell align="center" sx={{ color: 'white' }}>Eliminar&lt;/TableCell>
+                  &lt;TableCell align="center" sx={{ color: 'white' }}>Editar&lt;/TableCell>
+                &lt;/TableRow>
+              &lt;/TableHead>
+              &lt;TableBody>
+                {rows.map((row) => (
+                  &lt;TableRow
+                    key={row.id_empleado}
+                    sx={{ '&amp;:nth-of-type(odd)': { backgroundColor: '#f5f5f5' } }}
+                  >
+                    &lt;TableCell align="right">{row.id_empleado}&lt;/TableCell>
+                    &lt;TableCell>{row.nombre}&lt;/TableCell>
+                    &lt;TableCell>{row.email}&lt;/TableCell>
+                    &lt;TableCell>{row.salario} €&lt;/TableCell>
+                    &lt;TableCell>{new Date(row.fecha_contratacion).toLocaleDateString()}&lt;/TableCell>
+                    &lt;TableCell>{row.departamento?.nombre || 'N/A'}&lt;/TableCell>
+                    &lt;TableCell align="center">
+                      &lt;Button
+                        variant="contained"
+                        onClick={() => handleDelete(row.id_empleado)}
+                        color="error"
+                        size="small"
+                      >
+                        &lt;DeleteForeverIcon fontSize="small" />
+                      &lt;/Button>
+                    &lt;/TableCell>
+                    &lt;TableCell align="center">
+                      &lt;Button
+                        variant="contained"
+                        onClick={() => navigate(`/modificarempleado/${row.id_empleado}`)}
+                        color="primary"
+                        size="small"
+                      >
+                        &lt;EditNoteIcon fontSize="small" />
+                      &lt;/Button>
+                    &lt;/TableCell>
+                  &lt;/TableRow>
+                ))}
+              &lt;/TableBody>
+            &lt;/Table>
+          &lt;/TableContainer>
+        )}
+      &lt;/Grid2>
+    &lt;/Box>
+  );
+}
+
+export default ListadoEmpleado;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#AltaDepartamento">AltaDepartamento</a></li><li><a href="global.html#AltaEmpleado">AltaEmpleado</a></li><li><a href="global.html#BuscarDepartamento">BuscarDepartamento</a></li><li><a href="global.html#BuscarEmpleado">BuscarEmpleado</a></li><li><a href="global.html#GraficaDepartamento">GraficaDepartamento</a></li><li><a href="global.html#GraficaEmpleados">GraficaEmpleados</a></li><li><a href="global.html#ListadoDepartamento">ListadoDepartamento</a></li><li><a href="global.html#ListadoEmpleado">ListadoEmpleado</a></li><li><a href="global.html#Menu">Menu</a></li><li><a href="global.html#ModificarDepartamento">ModificarDepartamento</a></li><li><a href="global.html#ModificarEmpleado">ModificarEmpleado</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Thu Feb 27 2025 11:25:20 GMT+0100 (hora estándar de Europa central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

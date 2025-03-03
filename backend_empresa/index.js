@@ -14,17 +14,39 @@ const port = process.env.PORT || 3000;
 // Configurar middleware para analizar JSON en las solicitudes
 app.use(express.json());
 // Configurar CORS para admitir cualquier origen
-app.use(cors());
+// app.use(cors());
+const allowedOrigins = [
+  "http://localhost:3000",  // Para desarrollo local
+  "https://empresa-production-479f.up.railway.app", // Para producción
+];
 
-app.use(express.static(path.join(__dirname, "public")));
-
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Permitir solicitudes sin origen (por ejemplo, desde Postman)
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("CORS no permitido"));
+    },
+    credentials: true, // Permite envío de cookies y headers autenticados
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  })
+);
 
 // Configurar rutas de la API Rest
 app.use("/api/departamentos", departamentoRoutes);
 app.use("/api/empleado", empleadoRoutes);
+
+// Servir archivos estáticos
+app.use(express.static(path.join(__dirname, "public")));
+
+// Ruta catch-all para la SPA
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
 
 // Iniciar el servidor solo si no estamos en modo de prueba
 if (process.env.NODE_ENV !== "test") {

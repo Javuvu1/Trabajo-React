@@ -9,11 +9,12 @@ import { apiUrl } from "../config";
  * @component
  */
 function AltaDepartamento() {
-  // Estado para almacenar los datos del formulario
+  // Estado para almacenar los datos del formulario, incluyendo fecha_creacion
   const [datos, setDatos] = useState({
     nombre: "",
     ubicacion: "",
     presupuesto: "",
+    fecha_creacion: "", // se espera formato YYYY-MM-DD
   });
 
   const navigate = useNavigate();
@@ -25,7 +26,6 @@ function AltaDepartamento() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Convertimos presupuesto a número (float) si tiene valor
     const datosFinales = {
       ...datos,
       presupuesto: datos.presupuesto ? parseFloat(datos.presupuesto) : null,
@@ -43,7 +43,6 @@ function AltaDepartamento() {
       if (response.ok) {
         const respuesta = await response.json();
         alert(respuesta?.mensaje || "Departamento creado correctamente.");
-
         if (respuesta.ok) {
           navigate("/"); // Volver a la página principal
         }
@@ -61,10 +60,8 @@ function AltaDepartamento() {
    * @param {Event} e - Evento de cambio en los campos del formulario.
    */
   const handleChange = (e) => {
-    setDatos({
-      ...datos,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setDatos({ ...datos, [name]: value });
   };
 
   return (
@@ -72,18 +69,9 @@ function AltaDepartamento() {
       <Typography variant="h4" align="center" sx={{ mt: 2 }}>
         Alta de Departamento
       </Typography>
-      <Grid2
-        container
-        spacing={2}
-        sx={{ mt: 2, justifyContent: "center", alignItems: "center" }}
-      >
+      <Grid2 container spacing={2} sx={{ mt: 2, justifyContent: "center", alignItems: "center" }}>
         <Grid2 item xs={12} sm={6} md={4}>
-          <Stack
-            component="form"
-            spacing={2}
-            onSubmit={handleSubmit}
-            sx={{ mx: 2 }}
-          >
+          <Stack component="form" spacing={2} onSubmit={handleSubmit} sx={{ mx: 2 }}>
             <TextField
               label="Nombre"
               variant="outlined"
@@ -107,6 +95,16 @@ function AltaDepartamento() {
               step="0.01"
               value={datos.presupuesto}
               onChange={handleChange}
+            />
+            <TextField
+              label="Fecha de Creación"
+              variant="outlined"
+              name="fecha_creacion"
+              type="date"
+              value={datos.fecha_creacion}
+              onChange={handleChange}
+              required
+              InputLabelProps={{ shrink: true }}
             />
             <Button variant="contained" type="submit">
               Aceptar

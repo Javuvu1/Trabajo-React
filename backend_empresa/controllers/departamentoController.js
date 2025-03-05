@@ -89,7 +89,8 @@ class DepartamentoController {
             const nuevoDepartamento = await Departamento.create({
                 nombre,
                 ubicacion,
-                presupuesto
+                presupuesto,
+                fecha_creacion: new Date()
             });
 
             res.status(201).json(Respuesta.exito(nuevoDepartamento, "Departamento creado"));
